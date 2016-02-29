@@ -32,9 +32,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         if (!OpenCVLoader.initDebug()) {
             Log.e(TAG, "Error loading OpenCV.");
         }
-        //System.loadLibrary("opencv_java3");
         System.loadLibrary("imageproc");
-        //System.loadLibrary("vrtoolkit");
     }
 
     protected void onCreate(Bundle savedInstanceState) {

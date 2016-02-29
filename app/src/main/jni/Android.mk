@@ -2,6 +2,9 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+#override OPENCV_INSTALL_MODULES:=on
+override OPENCV_CAMERA_MODULES:=on
+
 ifdef OPENCV_ANDROID_SDK
   ifneq ("","$(wildcard $(OPENCV_ANDROID_SDK)/OpenCV.mk)")
     include ${OPENCV_ANDROID_SDK}/OpenCV.mk
@@ -13,7 +16,8 @@ else
 endif
 
 LOCAL_MODULE    := imageproc
-LOCAL_SRC_FILES := jni_part.cpp
-LOCAL_LDLIBS +=  -llog -ldl
+LOCAL_SRC_FILES := jni_part.cpp ar_omp.cpp arucofidmarkers.cpp board.cpp boarddetector.cpp cameraparameters.cpp chromaticmask.cpp cvdrawingutils.cpp highlyreliablemarkers.cpp marker.cpp markerdetector.cpp subpixelcorner.cpp
+LOCAL_C_INCLUDES += $(LOCAL_PATH)
+LOCAL_LDLIBS +=  -llog -ldl -march=armv7-a -Wl,--fix-cortex-a8
 
 include $(BUILD_SHARED_LIBRARY)
