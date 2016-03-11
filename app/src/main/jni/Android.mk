@@ -16,7 +16,7 @@ else
 endif
 
 LOCAL_MODULE    := imageproc
-LOCAL_SRC_FILES := jni_part.cpp ar_omp.cpp arucofidmarkers.cpp board.cpp boarddetector.cpp cameraparameters.cpp chromaticmask.cpp cvdrawingutils.cpp highlyreliablemarkers.cpp marker.cpp markerdetector.cpp subpixelcorner.cpp
+LOCAL_SRC_FILES := jni_part.cpp aruco.cpp dictionary.cpp
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
 LOCAL_LDLIBS +=  -llog -ldl -march=armv7-a -Wl,--fix-cortex-a8
 

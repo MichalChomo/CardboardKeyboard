@@ -58,10 +58,8 @@ obj/local/armeabi-v7a/objs/imageproc/jni_part.o: jni/jni_part.cpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/miniflann.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/defines.h \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/config.h \
- jni/aruco.h jni/markerdetector.h \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/iostream \
- jni/cameraparameters.h jni/exports.h jni/marker.h jni/boarddetector.h \
- jni/board.h jni/cvdrawingutils.h
+ C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/android/log.h \
+ jni/aruco.hpp jni/dictionary.hpp
 
 C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/jni.h:
 
@@ -181,20 +179,8 @@ C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/defines.h:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/config.h:
 
-jni/aruco.h:
+C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/android/log.h:
 
-jni/markerdetector.h:
+jni/aruco.hpp:
 
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/iostream:
-
-jni/cameraparameters.h:
-
-jni/exports.h:
-
-jni/marker.h:
-
-jni/boarddetector.h:
-
-jni/board.h:
-
-jni/cvdrawingutils.h:
+jni/dictionary.hpp:

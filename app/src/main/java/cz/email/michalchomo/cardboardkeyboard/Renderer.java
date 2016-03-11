@@ -77,9 +77,9 @@ public class Renderer implements CardboardView.StereoRenderer {
 
     private ByteBuffer indexBuffer;    // Buffer for index-array
 
-    private int texture;
+    private int mGLSurfaceTexture;
     private CardboardView cardboardView;
-    private SurfaceTexture surface;
+    private SurfaceTexture mSurfaceTexture;
     private float[] mView;
     private float[] mCamera;
 
@@ -152,7 +152,7 @@ public class Renderer implements CardboardView.StereoRenderer {
      * Creates the buffers we use to store information about the 3D world. OpenGL doesn't use Java
      * arrays, but rather needs data in a format it can understand. Hence we use ByteBuffers.
      *
-     * @param config The EGL configuration used when creating the surface.
+     * @param config The EGL configuration used when creating the mSurfaceTexture.
      */
     @Override
     public void onSurfaceCreated(EGLConfig config) {
@@ -188,7 +188,7 @@ public class Renderer implements CardboardView.StereoRenderer {
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(mProgram);
 
-        texture = createTexture();
+        mGLSurfaceTexture = createTexture();
     }
 
     /**
@@ -200,8 +200,8 @@ public class Renderer implements CardboardView.StereoRenderer {
     public void onNewFrame(HeadTransform headTransform) {
         float[] mtx = new float[16];
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        surface.updateTexImage();
-        surface.getTransformMatrix(mtx);
+        mSurfaceTexture.updateTexImage();
+        mSurfaceTexture.getTransformMatrix(mtx);
     }
 
 
@@ -218,7 +218,7 @@ public class Renderer implements CardboardView.StereoRenderer {
         GLES20.glUseProgram(mProgram);
 
         GLES20.glActiveTexture(GL_TEXTURE_EXTERNAL_OES);
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture);
+        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mGLSurfaceTexture);
 
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
@@ -251,5 +251,6 @@ public class Renderer implements CardboardView.StereoRenderer {
     public void onFinishFrame(Viewport viewport) {
 
     }
+
 
 }

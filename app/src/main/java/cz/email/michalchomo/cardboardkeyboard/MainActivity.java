@@ -74,7 +74,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     @Override
     public void onCameraViewStarted(int width, int height) {
         mRgba = new Mat();
-
     }
 
     @Override

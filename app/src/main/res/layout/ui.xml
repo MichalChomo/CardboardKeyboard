@@ -3,7 +3,8 @@
     xmlns:opencv="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:keepScreenOn="true">
 
     <org.opencv.android.JavaCameraView
         android:id="@+id/camera_view"
