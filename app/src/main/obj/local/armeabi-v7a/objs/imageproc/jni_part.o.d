@@ -15,18 +15,13 @@ obj/local/armeabi-v7a/objs/imageproc/jni_part.o: jni/jni_part.cpp \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/asm/page.h \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/hal/interface.h \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/stdint.h \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/sys/_types.h \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/machine/_types.h \
+ C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdint \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/version.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/base.hpp \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/climits \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/algorithm \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvstd.hpp \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cctype \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/ptr.inl.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/neon_utils.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/traits.hpp \
@@ -35,13 +30,11 @@ obj/local/armeabi-v7a/objs/imageproc/jni_part.o: jni/jni_part.cpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/fast_math.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/types.hpp \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/mat.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/bufferpool.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/mat.inl.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/persistence.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/operations.hpp \
- C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdio \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvstd.inl.hpp \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/complex \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/utility.hpp \
@@ -53,11 +46,7 @@ obj/local/armeabi-v7a/objs/imageproc/jni_part.o: jni/jni_part.cpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgproc.hpp \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgproc/imgproc_c.h \
  C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgproc/types_c.h \
- C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/features2d/features2d.hpp \
- C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/features2d.hpp \
- C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/miniflann.hpp \
- C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/defines.h \
- C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/config.h \
+ C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgcodecs.hpp \
  C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/android/log.h \
  jni/aruco.hpp jni/dictionary.hpp
 
@@ -93,11 +82,7 @@ C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/hal/interface.h
 
 C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef:
 
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/stdint.h:
-
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/sys/_types.h:
-
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/machine/_types.h:
+C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdint:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/version.hpp:
 
@@ -110,12 +95,6 @@ C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvstd.hpp:
 
 C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring:
-
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cctype:
-
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
-
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/ptr.inl.hpp:
 
@@ -133,8 +112,6 @@ C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/types.hpp:
 
 C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat:
 
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/vector:
-
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/mat.hpp:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/bufferpool.hpp:
@@ -144,8 +121,6 @@ C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/mat.inl.hpp:
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/persistence.hpp:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/operations.hpp:
-
-C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdio:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/core/cvstd.inl.hpp:
 
@@ -169,15 +144,7 @@ C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgproc/imgproc_c.h:
 
 C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgproc/types_c.h:
 
-C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/features2d/features2d.hpp:
-
-C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/features2d.hpp:
-
-C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/miniflann.hpp:
-
-C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/defines.h:
-
-C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/flann/config.h:
+C:/OpenCV/OpenCV-android-sdk/sdk/native/jni/include/opencv2/imgcodecs.hpp:
 
 C:/Users/misoch/AppData/Local/Android/sdk/ndk-bundle/platforms/android-19/arch-arm/usr/include/android/log.h:
 

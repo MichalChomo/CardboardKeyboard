@@ -1,17 +1,15 @@
 package cz.email.michalchomo.cardboardkeyboard;
 
 import android.app.Activity;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceView;
-
-import com.google.vrtoolkit.cardboard.CardboardView;
 
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by Michal Chomo on 16. 2. 2016.
@@ -20,13 +18,14 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
     private static final String TAG = "MainActivity";
 
-    private JavaCameraView mOpenCvCameraView;
-    private CardboardView mCardboardView;
-
-    private Renderer renderer;
+    private CameraView mCameraView;
 
     private Mat mRgba;
     private Mat mGray;
+
+    private StreamReader mStreamReader;
+
+    private int frameSkipIndex;
 
     static {
         if (!OpenCVLoader.initDebug()) {
@@ -38,18 +37,12 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.ui);
+        setContentView(R.layout.layout);
 
-        mOpenCvCameraView = (JavaCameraView) findViewById(R.id.camera_view);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
-        mOpenCvCameraView.enableView();
-
-        renderer = new Renderer();
-        mCardboardView = (CardboardView) findViewById(R.id.cardboard_view);
-        mCardboardView.setRenderer(renderer);
-        mCardboardView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        mCardboardView.setZOrderMediaOverlay(true);
+        mCameraView = (CameraView) findViewById(R.id.camera_view);
+        mCameraView.setCvCameraViewListener(this);
+        mCameraView.enableView();
+        frameSkipIndex = 0;
     }
 
     @Override
@@ -60,20 +53,30 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     @Override
     public void onPause() {
         super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+        if (mCameraView != null)
+            mCameraView.disableView();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+        if (mCameraView != null)
+            mCameraView.disableView();
     }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
         mRgba = new Mat();
+        /*List<Camera.Size> resList = mCameraView.getResolutionList();
+
+        ListIterator<Camera.Size> resolutionItr = resList.listIterator();
+        while(resolutionItr.hasNext()) {
+            Camera.Size element = resolutionItr.next();
+            if(Integer.valueOf(element.width) == 640) {
+                mCameraView.setResolution(element);
+                break;
+            }
+        }*/
     }
 
     @Override
@@ -85,9 +88,23 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
-        FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+//        ++frameSkipIndex;
+//        if(frameSkipIndex == 2) {
+            detectMarkers(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+//            frameSkipIndex = 0;
+//        }
+
+        Mat half = mRgba.clone();
+
+        try {
+            Imgproc.resize(half, half, new Size(half.cols() / 2, half.rows()), 0, 0, Imgproc.INTER_LINEAR);
+            half.copyTo(mRgba.submat(new Rect(0, 0, half.cols(), half.rows())));
+            half.copyTo(mRgba.submat(new Rect(half.cols(), 0, half.cols(), half.rows())));
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
         return mRgba;
     }
 
-    public native void FindFeatures(long matAddrGr, long matAddrRgba);
+    public native void detectMarkers(long matAddrGr, long matAddrRgba);
 }
