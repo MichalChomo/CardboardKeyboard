@@ -2,7 +2,11 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include "opencv2/features2d.hpp"
+#include "opencv2/core/affine.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
 #include <vector>
+#include <sstream>
 #include <android/log.h>
 #include "aruco.hpp"
 
@@ -18,6 +22,13 @@ using namespace cv;
 using namespace aruco;
 
 extern "C" {
+
+string to_string(int num)
+{
+    ostringstream convert;
+    convert << num;
+    return convert.str();
+}
 
 // Return vector which indexes are markerIds from 0 to n and its values are indexes of markerCorners.
 // Example: marker with id 4 was detected first, so sortedIds[4] == 0
@@ -37,20 +48,60 @@ vector<int> getSortedIds(vector<int> &markerIds) {
     return sortedIds;
 }
 
-void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sortedIds) {
+void drawNoteNames(Mat &img, int octave) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
-    double fontScale = 2;
+    double fontScale = 2.0;
     int thickness = 3;
-    Point2f point;
+    double horizontalEighth = img.cols / 8;
+    double verticalEighth = img.rows / 8;
+    Point2f point = Point2f((horizontalEighth / 8), (img.rows - verticalEighth));
 
-    for(unsigned int i = 0; i < (sortedIds.size() - 1); i += 2)
+    putText(img, "C" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+    point.x += horizontalEighth;
+    putText(img, "D" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+    point.x += horizontalEighth;
+    putText(img, "E" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+    point.x += horizontalEighth;
+    putText(img, "F" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+    point.x += horizontalEighth;
+    putText(img, "G" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+
+}
+
+void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sortedIds) {
+    Mat overlay(mRgb.rows, mRgb.cols, CV_8UC3);
+    Mat overlayWarped, mask, maskInv, result1, result2;
+    Mat H;
+    vector< Point2f > octaveCorners;
+    vector< Point2f > overlayCorners;
+
+    drawNoteNames(overlay, 5);
+
+    overlayCorners.push_back(Point2f(0.0, 0.0));
+    overlayCorners.push_back(Point2f(0.0, overlay.rows));
+    overlayCorners.push_back(Point2f(overlay.cols, 0.0));
+    overlayCorners.push_back(Point2f(overlay.cols, overlay.rows));
+
+    for(unsigned int i = 0; i < (sortedIds.size() - 3); i += 2)
     {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "DEBUG size = %d", sortedIds.size());
-//        rectangle(mRgb, markerCorners[sortedIds[i]][BOTTOM_RIGHT], markerCorners[sortedIds[i+1]][TOP_LEFT], Scalar(0));
-        point.x = markerCorners[sortedIds[i]][BOTTOM_RIGHT].x; // + ((markerCorners[sortedIds[i+1]][BOTTOM_RIGHT].x - markerCorners[sortedIds[i]][BOTTOM_RIGHT].x) / 16);
-        point.y = markerCorners[sortedIds[i+1]][TOP_LEFT].y; // + ((markerCorners[sortedIds[i]][TOP_LEFT].y - markerCorners[sortedIds[i+1]][TOP_LEFT].y) / 8);
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "i = %d sortedIds[i] = %d", i, sortedIds[i]);
-        putText(mRgb, "C42", point, fontFace, fontScale, Scalar(0), thickness);
+        octaveCorners.push_back(markerCorners[sortedIds[i]][BOTTOM_LEFT]);
+        octaveCorners.push_back(markerCorners[sortedIds[i+1]][BOTTOM_LEFT]);
+        octaveCorners.push_back(markerCorners[sortedIds[i+2]][BOTTOM_RIGHT]);
+        octaveCorners.push_back(markerCorners[sortedIds[i+3]][BOTTOM_RIGHT]);
+        H = findHomography(overlayCorners, octaveCorners, RHO);
+        octaveCorners.clear();
+        if(H.empty()) {
+            return;
+        }
+        warpPerspective(overlay, overlayWarped, H, mRgb.size());
+        cvtColor(overlayWarped, mask, CV_BGR2GRAY);
+        threshold(mask, mask, 0, 255, CV_THRESH_BINARY);
+        bitwise_not(mask, maskInv);
+        mRgb.copyTo(result1, maskInv);
+        overlayWarped.copyTo(result2, mask);
+        mRgb = result1 + result2;
+        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "x1 = %f x2 = %f", markerCorners[sortedIds[i]][BOTTOM_RIGHT].x, markerCorners[sortedIds[i]][TOP_LEFT].x);
+
     }
 }
 
@@ -66,18 +117,16 @@ Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkers(JNIEnv *e
     Ptr<DetectorParameters> parameters = DetectorParameters::create();
     Ptr<Dictionary> dictionary = getPredefinedDictionary(DICT_4X4_50);
 
-    //parameters->doCornerRefinement = true;
     try {
         detectMarkers(mGr, dictionary, markerCorners, markerIds, parameters);
     } catch (cv::Exception& e) {
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%s", e.what());
     }
 
-    cvtColor(mRgb, mRgb, COLOR_BGRA2BGR);
-
-    if(markerIds.size() > 2) {
+    if(markerIds.size() > 3) {
         try {
-            drawDetectedMarkers(mRgb, markerCorners, markerIds);
+            cvtColor(mRgb, mRgb, COLOR_BGRA2BGR);
+            //drawDetectedMarkers(mRgb, markerCorners, markerIds);
             draw(mRgb, markerCorners, getSortedIds(markerIds));
         } catch (cv::Exception& e) {
             __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%s", e.what());

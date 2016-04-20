@@ -4,7 +4,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "cz.email.michalchomo.cardboardkeyboard"
@@ -45,7 +45,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':openCVLibrary310')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.3.0'
 }
 
 def getNdkDir() {

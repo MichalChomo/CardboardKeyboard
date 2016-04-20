@@ -1,6 +1,7 @@
 package cz.email.michalchomo.cardboardkeyboard;
 
 import android.app.Activity;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -10,6 +11,9 @@ import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Michal Chomo on 16. 2. 2016.
@@ -24,8 +28,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     private Mat mGray;
 
     private StreamReader mStreamReader;
-
-    private int frameSkipIndex;
 
     static {
         if (!OpenCVLoader.initDebug()) {
@@ -42,7 +44,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         mCameraView = (CameraView) findViewById(R.id.camera_view);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.enableView();
-        frameSkipIndex = 0;
     }
 
     @Override
@@ -66,17 +67,18 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-        mRgba = new Mat();
-        /*List<Camera.Size> resList = mCameraView.getResolutionList();
+        List<Camera.Size> resList = mCameraView.getResolutionList();
 
         ListIterator<Camera.Size> resolutionItr = resList.listIterator();
         while(resolutionItr.hasNext()) {
             Camera.Size element = resolutionItr.next();
-            if(Integer.valueOf(element.width) == 640) {
+//            Log.d("TAG", "res = "+ Integer.valueOf(element.width) + " x " + Integer.valueOf(element.height));
+            if(Integer.valueOf(element.width) == 864 && Integer.valueOf(element.height) == 480) {
                 mCameraView.setResolution(element);
                 break;
             }
-        }*/
+        }
+        mRgba = new Mat();
     }
 
     @Override
@@ -88,11 +90,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
-//        ++frameSkipIndex;
-//        if(frameSkipIndex == 2) {
-            detectMarkers(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
-//            frameSkipIndex = 0;
-//        }
+        detectMarkers(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
 
         Mat half = mRgba.clone();
 
