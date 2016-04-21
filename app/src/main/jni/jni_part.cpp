@@ -10,8 +10,8 @@
 #include <android/log.h>
 #include "aruco.hpp"
 
-#define APPNAME "CardboardKeyobard"
-#define SORTED_IDS_SIZE 42
+#define APPNAME "CardboardKeyboard"
+#define SORTED_IDS_SIZE 25
 #define TOP_LEFT 0
 #define TOP_RIGHT 1
 #define BOTTOM_RIGHT 2
@@ -36,14 +36,17 @@ vector<int> getSortedIds(vector<int> &markerIds) {
     // Initialize vector with fixed size and values -1.
     vector<int> sortedIds(SORTED_IDS_SIZE, -1);
     int i = 0;
+    int minId = SORTED_IDS_SIZE; // Lowest markerId, needed to determine octave.
 
     for(vector<int>::iterator it = markerIds.begin(); it != markerIds.end(); it++) {
         // Put markerId index as value and markerId as index to sortedIds.
         sortedIds.at(*it) = i;
         ++i;
+        if(*it < minId) minId = *it;
     }
     // Erase all unused elements(value == -1).
     sortedIds.erase(remove(sortedIds.begin(), sortedIds.end(), -1), sortedIds.end());
+    sortedIds.push_back(minId);
 
     return sortedIds;
 }
@@ -55,16 +58,12 @@ void drawNoteNames(Mat &img, int octave) {
     double horizontalEighth = img.cols / 8;
     double verticalEighth = img.rows / 8;
     Point2f point = Point2f((horizontalEighth / 8), (img.rows - verticalEighth));
+    string notes("CDEFGAHC");
 
-    putText(img, "C" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
-    point.x += horizontalEighth;
-    putText(img, "D" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
-    point.x += horizontalEighth;
-    putText(img, "E" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
-    point.x += horizontalEighth;
-    putText(img, "F" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
-    point.x += horizontalEighth;
-    putText(img, "G" + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+    for(auto c : notes) {
+        putText(img, c + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+        point.x += horizontalEighth;
+    }
 
 }
 
@@ -74,16 +73,17 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
     Mat H;
     vector< Point2f > octaveCorners;
     vector< Point2f > overlayCorners;
-
-    drawNoteNames(overlay, 5);
+    int octave = sortedIds.back();
 
     overlayCorners.push_back(Point2f(0.0, 0.0));
     overlayCorners.push_back(Point2f(0.0, overlay.rows));
     overlayCorners.push_back(Point2f(overlay.cols, 0.0));
     overlayCorners.push_back(Point2f(overlay.cols, overlay.rows));
 
-    for(unsigned int i = 0; i < (sortedIds.size() - 3); i += 2)
+    for(unsigned int i = 0; i < (sortedIds.size() - 4); i += 2)
     {
+        drawNoteNames(overlay, octave);
+        ++octave;
         octaveCorners.push_back(markerCorners[sortedIds[i]][BOTTOM_LEFT]);
         octaveCorners.push_back(markerCorners[sortedIds[i+1]][BOTTOM_LEFT]);
         octaveCorners.push_back(markerCorners[sortedIds[i+2]][BOTTOM_RIGHT]);
@@ -100,7 +100,6 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
         mRgb.copyTo(result1, maskInv);
         overlayWarped.copyTo(result2, mask);
         mRgb = result1 + result2;
-        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "x1 = %f x2 = %f", markerCorners[sortedIds[i]][BOTTOM_RIGHT].x, markerCorners[sortedIds[i]][TOP_LEFT].x);
 
     }
 }
