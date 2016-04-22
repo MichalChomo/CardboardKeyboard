@@ -21,6 +21,8 @@ using namespace std;
 using namespace cv;
 using namespace aruco;
 
+int color[3];
+
 extern "C" {
 
 string to_string(int num)
@@ -51,7 +53,19 @@ vector<int> getSortedIds(vector<int> &markerIds) {
     return sortedIds;
 }
 
-void drawNoteNames(Mat &img, int octave) {
+int getOctave(int id, int keysCount) {
+    switch(keysCount) {
+        case 49:
+        case 61:
+        case 76:
+            return (id + 3) / 2;
+        case 88:
+            return (id + 1) / 2;
+        default: return (id + 3) / 2;
+    }
+}
+
+void drawNoteNames(Mat &img, int octave, int color[3]) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
     double fontScale = 2.0;
     int thickness = 3;
@@ -61,7 +75,7 @@ void drawNoteNames(Mat &img, int octave) {
     string notes("CDEFGAHC");
 
     for(auto c : notes) {
-        putText(img, c + to_string(octave), point, fontFace, fontScale, Scalar(0, 255, 0), thickness);
+        putText(img, c + to_string(octave), point, fontFace, fontScale, Scalar(color[0], color[1], color[2]), thickness);
         point.x += horizontalEighth;
     }
 
@@ -73,7 +87,8 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
     Mat H;
     vector< Point2f > octaveCorners;
     vector< Point2f > overlayCorners;
-    int octave = sortedIds.back();
+    int octave = getOctave(sortedIds.back(), 49);
+    double alpha = 0.7; // The lower the value, the more visible overlay is.
 
     overlayCorners.push_back(Point2f(0.0, 0.0));
     overlayCorners.push_back(Point2f(0.0, overlay.rows));
@@ -82,7 +97,7 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
 
     for(unsigned int i = 0; i < (sortedIds.size() - 4); i += 2)
     {
-        drawNoteNames(overlay, octave);
+        drawNoteNames(overlay, octave, color);
         ++octave;
         octaveCorners.push_back(markerCorners[sortedIds[i]][BOTTOM_LEFT]);
         octaveCorners.push_back(markerCorners[sortedIds[i+1]][BOTTOM_LEFT]);
@@ -115,6 +130,9 @@ Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkers(JNIEnv *e
     vector< vector<Point2f> > markerCorners;
     Ptr<DetectorParameters> parameters = DetectorParameters::create();
     Ptr<Dictionary> dictionary = getPredefinedDictionary(DICT_4X4_50);
+    color[0] = 0;
+    color[1] = 255;
+    color[2] = 0;
 
     try {
         detectMarkers(mGr, dictionary, markerCorners, markerIds, parameters);
