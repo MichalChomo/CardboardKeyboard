@@ -88,7 +88,7 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
     vector< Point2f > octaveCorners;
     vector< Point2f > overlayCorners;
     int octave = getOctave(sortedIds.back(), 49);
-    double alpha = 0.7; // The lower the value, the more visible overlay is.
+    // double alpha = 0.7; // The lower the value, the more visible overlay is.
 
     overlayCorners.push_back(Point2f(0.0, 0.0));
     overlayCorners.push_back(Point2f(0.0, overlay.rows));
