@@ -22,17 +22,14 @@ using namespace cv;
 using namespace aruco;
 
 enum Color {COLOR_C, COLOR_D, COLOR_E, COLOR_F, COLOR_G, COLOR_A, COLOR_H, COLOR_TEXT};
-enum Chord {C, D, E, F, G, A, H};
+enum OctaveNote {C, D, E, F, G, A, H, CC};
 
 extern "C" {
 
-// x coordinates of circles for a chord, struct made for returning from function
-struct ChordXCoords {
-    double coords[3];
+struct ChordLinesPoints {
+    Point2f lineStarts[3];
+    Point2f lineEnds[3];
 };
-
-// x coordinates of circles for each key
-double KeyCirclesXCoords[8] = {0};
 
 string intToString(int num)
 {
@@ -105,96 +102,184 @@ void drawNoteNames(Mat &img, int octave) {
     }
 }
 
-double getKeyXCoord(int index, double eighth) {
-    if(KeyCirclesXCoords[0] == 0) {
-        double initialX = eighth / 8;
-        for(unsigned int i = 0; i < 8; ++i) {
-            KeyCirclesXCoords[i] = initialX;
-            initialX += eighth;
-        }
+double getXCoordOfNote(OctaveNote note, double horizontalEighth) {
+    switch(note) {
+        case C:
+            return 0.0;
+        case D:
+            return horizontalEighth;
+        case E:
+            return horizontalEighth * 2;
+        case F:
+            return horizontalEighth * 3;
+        case G:
+            return horizontalEighth * 4;
+        case A:
+            return horizontalEighth * 5;
+        case H:
+            return horizontalEighth * 6;
+        case CC:
+            return horizontalEighth * 7;
+        default: break;
     }
-
-    double returnedCoord = KeyCirclesXCoords[index];
-    KeyCirclesXCoords[index] += eighth / 4;
-
-    return returnedCoord;
 }
 
-ChordXCoords getChordXCoords(Chord c, double eighth) {
-    ChordXCoords chordXCoords;
+ChordLinesPoints getChordLinePoints(OctaveNote chord, double horizontalEighth, double verticalEighth) {
+    ChordLinesPoints linesPoints;
+    Point2f point;
 
-    switch(c) {
+    switch(chord) {
         case C:
-            chordXCoords.coords[0] = getKeyXCoord(0, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(2, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(4, eighth);
+            point.y = verticalEighth * 5.5;
+            point.x = getXCoordOfNote(C, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(E, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(G, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         case D:
-            chordXCoords.coords[0] = getKeyXCoord(1, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(3, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(5, eighth);
+            point.y = verticalEighth * 5.6;
+            point.x = getXCoordOfNote(D, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(F, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(A, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         case E:
-            chordXCoords.coords[0] = getKeyXCoord(2, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(4, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(6, eighth);
+            point.y = verticalEighth * 5.7;
+            point.x = getXCoordOfNote(E, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(G, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(H, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         case F:
-            chordXCoords.coords[0] = getKeyXCoord(3, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(0, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(5, eighth);
+            point.y = verticalEighth * 5.8;
+            point.x = getXCoordOfNote(F, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(A, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(CC, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         case G:
-            chordXCoords.coords[0] = getKeyXCoord(4, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(1, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(6, eighth);
+            point.y = verticalEighth * 5.9;
+            point.x = getXCoordOfNote(G, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(H, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(D, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         case A:
-            chordXCoords.coords[0] = getKeyXCoord(5, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(2, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(0, eighth);
+            point.y = verticalEighth * 6.0;
+            point.x = getXCoordOfNote(A, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(E, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(CC, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         case H:
-            chordXCoords.coords[0] = getKeyXCoord(4, eighth);
-            chordXCoords.coords[1] = getKeyXCoord(1, eighth);
-            chordXCoords.coords[2] = getKeyXCoord(6, eighth);
+            point.y = verticalEighth * 6.1;
+            point.x = getXCoordOfNote(H, horizontalEighth);
+            linesPoints.lineStarts[0] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[0] = point;
+
+            point.x = getXCoordOfNote(F, horizontalEighth);
+            linesPoints.lineStarts[1] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[1] = point;
+
+            point.x = getXCoordOfNote(D, horizontalEighth);
+            linesPoints.lineStarts[2] = point;
+            point.x += horizontalEighth;
+            linesPoints.lineEnds[2] = point;
             break;
         default: break;
     }
-    return chordXCoords;
+
+    return linesPoints;
 }
 
 void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
     double fontScale = 1.4;
-    int thickness = 5;
+    int textThickness = 5;
     double horizontalEighth = octaveRoi.cols / 8;
     double verticalEighth = octaveRoi.rows / 8;
     string chordNames("CDEFGAH");
     Point2f namePosition = Point2f(horizontalEighth, verticalEighth);
     Color color = COLOR_C;
     int colorInt = static_cast<int>(color);
-    double chordYCoord = verticalEighth * 6 - 10;
-    ChordXCoords chordXCoords;
-
-    Point2f circlePosition = Point2f(0.0, chordYCoord);
+    int lineThickness = 3;
+    ChordLinesPoints linesPoints;
 
     for(unsigned int i = 0; i < chordNames.size(); ++i) {
-        putText(wholeScreen, chordNames.substr(i, 1), namePosition, fontFace, fontScale, getColor(static_cast<Color>(i)), thickness);
+        putText(wholeScreen, chordNames.substr(i, 1), namePosition, fontFace, fontScale, getColor(static_cast<Color>(i)), textThickness);
         namePosition.x += horizontalEighth;
 
-        chordXCoords = getChordXCoords(static_cast<Chord>(i), horizontalEighth);
-        circlePosition.x = chordXCoords.coords[0];
-        // First circle is always root note, draw black border.
-        circle(octaveRoi, circlePosition, 10, getColor(static_cast<Color>(i)), -1);
-        circle(octaveRoi, circlePosition, 11, Scalar(0, 0, 0), 2);
-        circlePosition.x = chordXCoords.coords[1];
-        circle(octaveRoi, circlePosition, 10, getColor(static_cast<Color>(i)), -1);
-        circlePosition.x = chordXCoords.coords[2];
-        circle(octaveRoi, circlePosition, 10, getColor(static_cast<Color>(i)), -1);
-    }
-    for(unsigned int i = 0; i < 8; ++i) {
-        KeyCirclesXCoords[i] = 0.0;
+        linesPoints = getChordLinePoints(static_cast<OctaveNote>(i), horizontalEighth, verticalEighth);
+        for(unsigned int j = 0; j < 3; ++j) {
+            line(octaveRoi, linesPoints.lineStarts[j], linesPoints.lineEnds[j], getColor(static_cast<Color>(i)), lineThickness);
+            // Emphasize root note with white circle in the center of the line.
+            if(j == 0) {
+                Point2f point = Point2f((linesPoints.lineStarts[j].x + linesPoints.lineEnds[j].x) / 2, linesPoints.lineStarts[j].y);
+                circle(octaveRoi, point, 5, Scalar(255, 255, 255), -1);
+            }
+        }
     }
 
 }
