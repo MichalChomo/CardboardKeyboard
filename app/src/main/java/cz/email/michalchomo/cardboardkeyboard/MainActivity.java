@@ -90,7 +90,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
-        detectMarkers(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+        detectMarkersAndDraw(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
 
         Mat half = mRgba.clone();
 
@@ -104,5 +104,5 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         return mRgba;
     }
 
-    public native void detectMarkers(long matAddrGr, long matAddrRgba);
+    public native void detectMarkersAndDraw(long matAddrGr, long matAddrRgba);
 }

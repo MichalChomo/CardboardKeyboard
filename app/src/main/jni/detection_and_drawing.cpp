@@ -21,11 +21,12 @@ using namespace std;
 using namespace cv;
 using namespace aruco;
 
-int color[3];
+enum Color {COLOR_C, COLOR_D, COLOR_E, COLOR_F, COLOR_G, COLOR_A, COLOR_H, COLOR_TEXT};
+enum Key {C, D, E, F, G, A, H, CC};
 
 extern "C" {
 
-string to_string(int num)
+string intToString(int num)
 {
     ostringstream convert;
     convert << num;
@@ -53,6 +54,20 @@ vector<int> getSortedIds(vector<int> &markerIds) {
     return sortedIds;
 }
 
+Scalar getColor(Color c) {
+    static vector< Scalar > colors;
+    colors.push_back(Scalar(239, 10, 0)); // RED
+    colors.push_back(Scalar(0, 14, 239)); // BLUE
+    colors.push_back(Scalar(250, 90, 7)); // ORANGE
+    colors.push_back(Scalar(240, 0, 230)); // PINK
+    colors.push_back(Scalar(240, 240, 0)); // YELLOW
+    colors.push_back(Scalar(117, 44, 0)); // BROWN
+    colors.push_back(Scalar(0, 230, 240)); // TURQUOISE
+    colors.push_back(Scalar(0, 210, 0)); // GREEN
+
+    return colors.at(c);
+}
+
 int getOctave(int id, int keysCount) {
     switch(keysCount) {
         case 49:
@@ -65,7 +80,7 @@ int getOctave(int id, int keysCount) {
     }
 }
 
-void drawNoteNames(Mat &img, int octave, int color[3]) {
+void drawNoteNames(Mat &img, int octave) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
     double fontScale = 2.0;
     int thickness = 3;
@@ -75,8 +90,36 @@ void drawNoteNames(Mat &img, int octave, int color[3]) {
     string notes("CDEFGAHC");
 
     for(auto c : notes) {
-        putText(img, c + to_string(octave), point, fontFace, fontScale, Scalar(color[0], color[1], color[2]), thickness);
+        putText(img, c + intToString(octave), point, fontFace, fontScale, getColor(COLOR_TEXT), thickness);
         point.x += horizontalEighth;
+    }
+}
+
+double getChordCircleX(Key k, double eighth) {
+    static double coords[] = {0};
+    return 0.0;
+}
+
+void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
+    int fontFace = FONT_HERSHEY_SIMPLEX;
+    double fontScale = 1.4;
+    int thickness = 5;
+    double horizontalEighth = octaveRoi.cols / 8;
+    double verticalEighth = octaveRoi.rows / 8;
+    string chordNames("CDEFGAH");
+    Point2f point = Point2f(horizontalEighth, verticalEighth);
+    Color color = COLOR_C;
+    int colorInt = static_cast<int>(color);
+    double chordCircleY = verticalEighth * 6 - 10;
+
+    Point2f cpoint = Point2f(horizontalEighth, chordCircleY);
+    circle(octaveRoi, cpoint, 10, getColor(COLOR_C), -1);
+
+    for(unsigned int i = 0; i < chordNames.size(); ++i) {
+        putText(wholeScreen, chordNames.substr(i, 1), point, fontFace, fontScale, getColor(color), thickness);
+        point.x += horizontalEighth;
+        ++colorInt;
+        color = static_cast<Color>(colorInt);
     }
 
 }
@@ -97,7 +140,8 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
 
     for(unsigned int i = 0; i < (sortedIds.size() - 4); i += 2)
     {
-        drawNoteNames(overlay, octave, color);
+        drawNoteNames(overlay, octave);
+        drawChords(overlay, mRgb);
         ++octave;
         octaveCorners.push_back(markerCorners[sortedIds[i]][BOTTOM_LEFT]);
         octaveCorners.push_back(markerCorners[sortedIds[i+1]][BOTTOM_LEFT]);
@@ -120,9 +164,9 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
 }
 
 JNIEXPORT void JNICALL
-Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkers(JNIEnv *env, jobject instance,
-                                                                      jlong matAddrGr,
-                                                                      jlong matAddrRgba) {
+Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkersAndDraw(JNIEnv *env, jobject instance,
+                                                                            jlong matAddrGr,
+                                                                            jlong matAddrRgba) {
     Mat &mGr = *(Mat *) matAddrGr;
     Mat &mRgb = *(Mat *) matAddrRgba;
 
@@ -130,9 +174,6 @@ Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkers(JNIEnv *e
     vector< vector<Point2f> > markerCorners;
     Ptr<DetectorParameters> parameters = DetectorParameters::create();
     Ptr<Dictionary> dictionary = getPredefinedDictionary(DICT_4X4_50);
-    color[0] = 0;
-    color[1] = 255;
-    color[2] = 0;
 
     try {
         detectMarkers(mGr, dictionary, markerCorners, markerIds, parameters);
