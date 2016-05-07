@@ -3,6 +3,7 @@ package cz.email.michalchomo.cardboardkeyboard;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -72,8 +73,8 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         ListIterator<Camera.Size> resolutionItr = resList.listIterator();
         while(resolutionItr.hasNext()) {
             Camera.Size element = resolutionItr.next();
-//            Log.d("TAG", "res = "+ Integer.valueOf(element.width) + " x " + Integer.valueOf(element.height));
-            if(Integer.valueOf(element.width) == 864 && Integer.valueOf(element.height) == 480) {
+            Log.d("TAG", "res = "+ element.width + " x " + element.height);
+            if(element.width == 800 && element.height == 480) {
                 mCameraView.setResolution(element);
                 break;
             }
@@ -90,6 +91,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
+
         detectMarkersAndDraw(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
 
         Mat half = mRgba.clone();
@@ -101,6 +103,9 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
+
+        half.release();
+
         return mRgba;
     }
 

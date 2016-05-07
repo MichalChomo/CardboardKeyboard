@@ -65,7 +65,7 @@ vector<int> getSortedIds(vector<int> &markerIds) {
 }
 
 Scalar getColor(Color c) {
-    static Scalar colors[15];
+    static Scalar colors[8];
     colors[static_cast<int>(COLOR_TEXT)] = Scalar(0, 210, 0);
     colors[static_cast<int>(COLOR_C)] = Scalar(239, 10, 0);
     colors[static_cast<int>(COLOR_D)] = Scalar(0, 14, 239);
@@ -182,8 +182,6 @@ void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
     for(unsigned int i = 0; i < chordNames.size(); ++i) {
         putText(wholeScreen, chordNames.substr(i, 1), namePosition, fontFace, fontScale, getColor(static_cast<Color>(i)), thickness);
         namePosition.x += horizontalEighth;
-        //++colorInt;
-        //color = static_cast<Color>(colorInt);
 
         chordXCoords = getChordXCoords(static_cast<Chord>(i), horizontalEighth);
         circlePosition.x = chordXCoords.coords[0];
@@ -202,13 +200,12 @@ void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
 }
 
 void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sortedIds) {
-    Mat overlay(mRgb.rows, mRgb.cols, CV_8UC3);
+    Mat overlay(mRgb.rows, mRgb.cols, CV_8UC4);
     Mat overlayWarped, mask, maskInv, result1, result2;
     Mat H;
     vector< Point2f > octaveCorners;
     vector< Point2f > overlayCorners;
     int octave = getOctave(sortedIds.back(), 49);
-    // double alpha = 0.7; // The lower the value, the more visible overlay is.
 
     overlayCorners.push_back(Point2f(0.0, 0.0));
     overlayCorners.push_back(Point2f(0.0, overlay.rows));
@@ -249,18 +246,17 @@ Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkersAndDraw(JN
 
     vector< int > markerIds;
     vector< vector<Point2f> > markerCorners;
-    Ptr<DetectorParameters> parameters = DetectorParameters::create();
     Ptr<Dictionary> dictionary = getPredefinedDictionary(DICT_4X4_50);
 
     try {
-        detectMarkers(mGr, dictionary, markerCorners, markerIds, parameters);
+        detectMarkers(mGr, dictionary, markerCorners, markerIds);
     } catch (cv::Exception& e) {
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "%s", e.what());
     }
 
     if(markerIds.size() > 3) {
         try {
-            cvtColor(mRgb, mRgb, COLOR_BGRA2BGR);
+            //cvtColor(mRgb, mRgb, COLOR_BGRA2BGR);
             //drawDetectedMarkers(mRgb, markerCorners, markerIds);
             draw(mRgb, markerCorners, getSortedIds(markerIds));
         } catch (cv::Exception& e) {
