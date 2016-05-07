@@ -22,9 +22,17 @@ using namespace cv;
 using namespace aruco;
 
 enum Color {COLOR_C, COLOR_D, COLOR_E, COLOR_F, COLOR_G, COLOR_A, COLOR_H, COLOR_TEXT};
-enum Key {C, D, E, F, G, A, H, CC};
+enum Chord {C, D, E, F, G, A, H};
 
 extern "C" {
+
+// x coordinates of circles for a chord, struct made for returning from function
+struct ChordXCoords {
+    double coords[3];
+};
+
+// x coordinates of circles for each key
+double KeyCirclesXCoords[8] = {0};
 
 string intToString(int num)
 {
@@ -49,23 +57,25 @@ vector<int> getSortedIds(vector<int> &markerIds) {
     }
     // Erase all unused elements(value == -1).
     sortedIds.erase(remove(sortedIds.begin(), sortedIds.end(), -1), sortedIds.end());
+
+    // Store minimal ID for determining octave.
     sortedIds.push_back(minId);
 
     return sortedIds;
 }
 
 Scalar getColor(Color c) {
-    static vector< Scalar > colors;
-    colors.push_back(Scalar(239, 10, 0)); // RED
-    colors.push_back(Scalar(0, 14, 239)); // BLUE
-    colors.push_back(Scalar(250, 90, 7)); // ORANGE
-    colors.push_back(Scalar(240, 0, 230)); // PINK
-    colors.push_back(Scalar(240, 240, 0)); // YELLOW
-    colors.push_back(Scalar(117, 44, 0)); // BROWN
-    colors.push_back(Scalar(0, 230, 240)); // TURQUOISE
-    colors.push_back(Scalar(0, 210, 0)); // GREEN
+    static Scalar colors[15];
+    colors[static_cast<int>(COLOR_TEXT)] = Scalar(0, 210, 0);
+    colors[static_cast<int>(COLOR_C)] = Scalar(239, 10, 0);
+    colors[static_cast<int>(COLOR_D)] = Scalar(0, 14, 239);
+    colors[static_cast<int>(COLOR_E)] = Scalar(250, 90, 7);
+    colors[static_cast<int>(COLOR_F)] = Scalar(240, 0, 230);
+    colors[static_cast<int>(COLOR_G)] = Scalar(240, 240, 0);
+    colors[static_cast<int>(COLOR_A)] = Scalar(117, 44, 0);
+    colors[static_cast<int>(COLOR_H)] = Scalar(0, 230, 240);
 
-    return colors.at(c);
+    return colors[c];
 }
 
 int getOctave(int id, int keysCount) {
@@ -86,18 +96,72 @@ void drawNoteNames(Mat &img, int octave) {
     int thickness = 3;
     double horizontalEighth = img.cols / 8;
     double verticalEighth = img.rows / 8;
-    Point2f point = Point2f((horizontalEighth / 8), (img.rows - verticalEighth));
+    Point2f notePosition = Point2f((horizontalEighth / 8), (img.rows - verticalEighth));
     string notes("CDEFGAHC");
 
     for(auto c : notes) {
-        putText(img, c + intToString(octave), point, fontFace, fontScale, getColor(COLOR_TEXT), thickness);
-        point.x += horizontalEighth;
+        putText(img, c + intToString(octave), notePosition, fontFace, fontScale, getColor(COLOR_TEXT), thickness);
+        notePosition.x += horizontalEighth;
     }
 }
 
-double getChordCircleX(Key k, double eighth) {
-    static double coords[] = {0};
-    return 0.0;
+double getKeyXCoord(int index, double eighth) {
+    if(KeyCirclesXCoords[0] == 0) {
+        double initialX = eighth / 8;
+        for(unsigned int i = 0; i < 8; ++i) {
+            KeyCirclesXCoords[i] = initialX;
+            initialX += eighth;
+        }
+    }
+
+    double returnedCoord = KeyCirclesXCoords[index];
+    KeyCirclesXCoords[index] += eighth / 4;
+
+    return returnedCoord;
+}
+
+ChordXCoords getChordXCoords(Chord c, double eighth) {
+    ChordXCoords chordXCoords;
+
+    switch(c) {
+        case C:
+            chordXCoords.coords[0] = getKeyXCoord(0, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(2, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(4, eighth);
+            break;
+        case D:
+            chordXCoords.coords[0] = getKeyXCoord(1, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(3, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(5, eighth);
+            break;
+        case E:
+            chordXCoords.coords[0] = getKeyXCoord(2, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(4, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(6, eighth);
+            break;
+        case F:
+            chordXCoords.coords[0] = getKeyXCoord(3, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(0, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(5, eighth);
+            break;
+        case G:
+            chordXCoords.coords[0] = getKeyXCoord(4, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(1, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(6, eighth);
+            break;
+        case A:
+            chordXCoords.coords[0] = getKeyXCoord(5, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(2, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(0, eighth);
+            break;
+        case H:
+            chordXCoords.coords[0] = getKeyXCoord(4, eighth);
+            chordXCoords.coords[1] = getKeyXCoord(1, eighth);
+            chordXCoords.coords[2] = getKeyXCoord(6, eighth);
+            break;
+        default: break;
+    }
+    return chordXCoords;
 }
 
 void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
@@ -107,19 +171,32 @@ void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
     double horizontalEighth = octaveRoi.cols / 8;
     double verticalEighth = octaveRoi.rows / 8;
     string chordNames("CDEFGAH");
-    Point2f point = Point2f(horizontalEighth, verticalEighth);
+    Point2f namePosition = Point2f(horizontalEighth, verticalEighth);
     Color color = COLOR_C;
     int colorInt = static_cast<int>(color);
-    double chordCircleY = verticalEighth * 6 - 10;
+    double chordYCoord = verticalEighth * 6 - 10;
+    ChordXCoords chordXCoords;
 
-    Point2f cpoint = Point2f(horizontalEighth, chordCircleY);
-    circle(octaveRoi, cpoint, 10, getColor(COLOR_C), -1);
+    Point2f circlePosition = Point2f(0.0, chordYCoord);
 
     for(unsigned int i = 0; i < chordNames.size(); ++i) {
-        putText(wholeScreen, chordNames.substr(i, 1), point, fontFace, fontScale, getColor(color), thickness);
-        point.x += horizontalEighth;
-        ++colorInt;
-        color = static_cast<Color>(colorInt);
+        putText(wholeScreen, chordNames.substr(i, 1), namePosition, fontFace, fontScale, getColor(static_cast<Color>(i)), thickness);
+        namePosition.x += horizontalEighth;
+        //++colorInt;
+        //color = static_cast<Color>(colorInt);
+
+        chordXCoords = getChordXCoords(static_cast<Chord>(i), horizontalEighth);
+        circlePosition.x = chordXCoords.coords[0];
+        // First circle is always root note, draw black border.
+        circle(octaveRoi, circlePosition, 10, getColor(static_cast<Color>(i)), -1);
+        circle(octaveRoi, circlePosition, 11, Scalar(0, 0, 0), 2);
+        circlePosition.x = chordXCoords.coords[1];
+        circle(octaveRoi, circlePosition, 10, getColor(static_cast<Color>(i)), -1);
+        circlePosition.x = chordXCoords.coords[2];
+        circle(octaveRoi, circlePosition, 10, getColor(static_cast<Color>(i)), -1);
+    }
+    for(unsigned int i = 0; i < 8; ++i) {
+        KeyCirclesXCoords[i] = 0.0;
     }
 
 }
