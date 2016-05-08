@@ -22,19 +22,25 @@ import java.util.ListIterator;
 public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String TAG = "MainActivity";
+    private static final int ResolutionX = 800;
+    private static final int ResolutionY = 480;
 
     private CameraView mCameraView;
 
     private Mat mRgba;
     private Mat mGray;
+    private Mat mHalf;
 
-    private StreamReader mStreamReader;
-
+    // Load OpenCV and imageproc libraries.
     static {
         if (!OpenCVLoader.initDebug()) {
             Log.e(TAG, "Error loading OpenCV.");
         }
-        System.loadLibrary("imageproc");
+        try {
+            System.loadLibrary("imageproc");
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +79,11 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         ListIterator<Camera.Size> resolutionItr = resList.listIterator();
         while(resolutionItr.hasNext()) {
             Camera.Size element = resolutionItr.next();
-            Log.d("TAG", "res = "+ element.width + " x " + element.height);
-            if(element.width == 800 && element.height == 480) {
+            if(element.width == ResolutionX && element.height == ResolutionY) {
                 mCameraView.setResolution(element);
                 break;
             }
         }
-        mRgba = new Mat();
     }
 
     @Override
@@ -94,17 +98,17 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
         detectMarkersAndDraw(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
 
-        Mat half = mRgba.clone();
+        mHalf = mRgba.clone();
 
         try {
-            Imgproc.resize(half, half, new Size(half.cols() / 2, half.rows()), 0, 0, Imgproc.INTER_LINEAR);
-            half.copyTo(mRgba.submat(new Rect(0, 0, half.cols(), half.rows())));
-            half.copyTo(mRgba.submat(new Rect(half.cols(), 0, half.cols(), half.rows())));
+            Imgproc.resize(mHalf, mHalf, new Size(mHalf.cols() / 2, mHalf.rows()), 0, 0, Imgproc.INTER_LINEAR);
+            mHalf.copyTo(mRgba.submat(new Rect(0, 0, mHalf.cols(), mHalf.rows())));
+            mHalf.copyTo(mRgba.submat(new Rect(mHalf.cols(), 0, mHalf.cols(), mHalf.rows())));
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
 
-        half.release();
+        mHalf.release();
 
         return mRgba;
     }
