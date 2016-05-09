@@ -11,7 +11,7 @@
 #include "aruco.hpp"
 
 #define APPNAME "CardboardKeyboard"
-#define SORTED_IDS_SIZE 25
+#define SORTED_IDS_SIZE 17
 #define TOP_LEFT 0
 #define TOP_RIGHT 1
 #define BOTTOM_RIGHT 2
@@ -41,7 +41,7 @@ string intToString(int num)
     return convert.str();
 }
 
-// Return vector which indexes are markerIds from 0 to n and its values are indexes of markerCorners.
+// Return vector which indexes are markerIds from 1 to n and its values are indexes of markerCorners.
 // Example: marker with id 4 was detected first, so sortedIds[4] == 0
 // @param &markerIds Reference to vector of marker ID's.
 // @return Vector of marker ID's sorted by id.
@@ -389,7 +389,7 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
 }
 
 JNIEXPORT void JNICALL
-Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkersAndDraw(JNIEnv *env, jobject instance,
+Java_cz_email_michalchomo_cardboardkeyboard_MainActivity_detectMarkersAndDraw(JNIEnv *env,
                                                                             jlong matAddrGr,
                                                                             jlong matAddrRgba) {
     // Grayscale and color image from camera.

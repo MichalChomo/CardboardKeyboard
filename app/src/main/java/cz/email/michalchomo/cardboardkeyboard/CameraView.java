@@ -1,8 +1,6 @@
 package cz.email.michalchomo.cardboardkeyboard;
 
 import android.content.Context;
-import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 
@@ -10,7 +8,7 @@ import org.opencv.android.JavaCameraView;
 
 import java.util.List;
 
-public class CameraView extends JavaCameraView implements PictureCallback {
+public class CameraView extends JavaCameraView {
 
     private static final String TAG = "CameraView";
 
@@ -39,10 +37,5 @@ public class CameraView extends JavaCameraView implements PictureCallback {
 
     public void setFps(int[] fps) {
         mCamera.getParameters().setPreviewFpsRange(fps[0], fps[1]);
-    }
-
-    @Override
-    public void onPictureTaken(byte[] data, Camera camera) {
-
     }
 }

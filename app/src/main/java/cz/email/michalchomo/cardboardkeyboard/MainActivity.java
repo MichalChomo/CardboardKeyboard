@@ -3,11 +3,9 @@ package cz.email.michalchomo.cardboardkeyboard;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
@@ -33,11 +31,9 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
     // Load OpenCV and imageproc libraries.
     static {
-        if (!OpenCVLoader.initDebug()) {
-            Log.e(TAG, "Error loading OpenCV.");
-        }
         try {
             System.loadLibrary("imageproc");
+            System.loadLibrary("opencv_java3");
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
