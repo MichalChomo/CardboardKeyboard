@@ -85,7 +85,7 @@ Scalar getColor(Color c) {
 // @param id ID of the marker which has the least ID of detected markers.
 // @param keysCount Count of keys on the piano.
 // @return Number of the octave.
-int getOctave(int id, int keysCount) {
+int getOctaveNumber(int id, int keysCount) {
     switch(keysCount) {
         case 49:
         case 61:
@@ -100,18 +100,22 @@ int getOctave(int id, int keysCount) {
 // Draw note name with octave numbe on each key.
 // @param &img Reference to overlay image.
 // @param octave Number of octave.
-void drawNoteNames(Mat &img, int octave) {
+void drawNoteNames(Mat &overlay, int octaveNumber) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
     double fontScale = 2.0;
     int thickness = 3;
-    double horizontalEighth = img.cols / 8;
-    double verticalEighth = img.rows / 8;
-    Point2f notePosition = Point2f((horizontalEighth / 8), (img.rows - verticalEighth));
+
+    double horizontalEighth = overlay.cols / 8;
+    double verticalEighth = overlay.rows / 8;
+
+    Point2f notePosition = Point2f((horizontalEighth / 8), (overlay.rows - verticalEighth));
     string notes("CDEFGAHC");
 
     for(auto c : notes) {
-        putText(img, c + intToString(octave), notePosition, fontFace, fontScale, getColor(COLOR_TEXT), thickness);
+        putText(overlay, c + intToString(octaveNumber), notePosition, fontFace, fontScale, getColor(COLOR_TEXT), thickness);
         notePosition.x += horizontalEighth;
+        // Second C is one octave higher.
+        if(c == 'H') ++octaveNumber;
     }
 }
 
@@ -278,13 +282,13 @@ ChordLinesPoints getChordLinePoints(OctaveNote chord, double horizontalEighth, d
 // Draw chord letters and lines to corresponding keys for chord.
 // @param &octaveRoi Reference to overlay part which will be drawn to octave region.
 // @param &wholeScreen Reference to image from camera.
-void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
+void drawChords(Mat &overlay, Mat &wholeScreen) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
     double fontScale = 1.4;
     int textThickness = 5;
 
-    double horizontalEighth = octaveRoi.cols / 8;
-    double verticalEighth = octaveRoi.rows / 8;
+    double horizontalEighth = overlay.cols / 8;
+    double verticalEighth = overlay.rows / 8;
 
     string chordNames("CDEFGAH");
     // Chord names will be on top of the whole screen.
@@ -301,11 +305,11 @@ void drawChords(Mat &octaveRoi, Mat &wholeScreen) {
 
         linesPoints = getChordLinePoints(static_cast<OctaveNote>(i), horizontalEighth, verticalEighth);
         for(unsigned int j = 0; j < 3; ++j) {
-            line(octaveRoi, linesPoints.lineStarts[j], linesPoints.lineEnds[j], getColor(static_cast<Color>(i)), lineThickness);
+            line(overlay, linesPoints.lineStarts[j], linesPoints.lineEnds[j], getColor(static_cast<Color>(i)), lineThickness);
             // Emphasize root note with white circle in the center of the line.
             if(j == 0) {
                 Point2f point = Point2f((linesPoints.lineStarts[j].x + linesPoints.lineEnds[j].x) / 2, linesPoints.lineStarts[j].y);
-                circle(octaveRoi, point, 5, Scalar(255, 255, 255), -1);
+                circle(overlay, point, 5, Scalar(255, 255, 255), -1);
             }
         }
     }
@@ -333,7 +337,7 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
     vector< Point2f > overlayCorners;
 
     // Number of the octave.
-    int octave = getOctave(sortedIds.back(), KEYS_COUNT);
+    int octaveNumber = getOctaveNumber(sortedIds.back(), KEYS_COUNT);
 
     // Fill overlay corners.
     overlayCorners.push_back(Point2f(0.0, 0.0));
@@ -342,10 +346,10 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
     overlayCorners.push_back(Point2f(overlay.cols, overlay.rows));
 
     // Repeat for each octave, octaves share 2 markers on start/end.
-    for(unsigned int i = 0; i < (sortedIds.size() - 4); i += 2)
+    for(unsigned int i = 0; i < (sortedIds.size() - 3); i += 2)
     {
-        drawNoteNames(overlay, octave);
-        ++octave;
+        drawNoteNames(overlay, octaveNumber);
+        ++octaveNumber;
 
         drawChords(overlay, mRgb);
 
