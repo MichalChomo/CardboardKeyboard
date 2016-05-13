@@ -3,6 +3,7 @@ package cz.email.michalchomo.cardboardkeyboard;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.opencv.android.CameraBridgeViewBase;

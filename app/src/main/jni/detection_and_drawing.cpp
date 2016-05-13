@@ -53,7 +53,11 @@ vector<int> getSortedIds(vector<int> &markerIds) {
 
     for(vector<int>::iterator it = markerIds.begin(); it != markerIds.end(); it++) {
         // Put markerId index as value and markerId as index to sortedIds.
-        sortedIds.at(*it) = i;
+        if(*it < SORTED_IDS_SIZE){
+            sortedIds.at(*it) = i;
+        } else {
+            break;
+        }
         ++i;
         if(*it < minId) minId = *it;
     }
@@ -102,11 +106,11 @@ int getOctaveNumber(int id, int keysCount) {
 // @param octave Number of octave.
 void drawNoteNames(Mat &overlay, int octaveNumber) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
-    double fontScale = 2.0;
+    float fontScale = 2.0;
     int thickness = 3;
 
-    double horizontalEighth = overlay.cols / 8;
-    double verticalEighth = overlay.rows / 8;
+    float horizontalEighth = overlay.cols / 8;
+    float verticalEighth = overlay.rows / 8;
 
     Point2f notePosition = Point2f((horizontalEighth / 8), (overlay.rows - verticalEighth));
     string notes("CDEFGAHC");
@@ -122,7 +126,7 @@ void drawNoteNames(Mat &overlay, int octaveNumber) {
 // Return X coordinate of a given note key.
 // @param horizontalEighth Eighth of a count of columns in the image.
 // @return X coordinate of a given note key.
-double getXCoordOfNote(OctaveNote note, double horizontalEighth) {
+float getXCoordOfNote(OctaveNote note, float horizontalEighth) {
     switch(note) {
         case C:
             return 0.0;
@@ -284,11 +288,11 @@ ChordLinesPoints getChordLinePoints(OctaveNote chord, double horizontalEighth, d
 // @param &wholeScreen Reference to image from camera.
 void drawChords(Mat &overlay, Mat &wholeScreen) {
     int fontFace = FONT_HERSHEY_SIMPLEX;
-    double fontScale = 1.4;
+    float fontScale = 1.4;
     int textThickness = 5;
 
-    double horizontalEighth = overlay.cols / 8;
-    double verticalEighth = overlay.rows / 8;
+    float horizontalEighth = overlay.cols / 8;
+    float verticalEighth = overlay.rows / 8;
 
     string chordNames("CDEFGAH");
     // Chord names will be on top of the whole screen.
@@ -364,7 +368,6 @@ void draw(Mat &mRgb, vector< vector<Point2f> > &markerCorners, vector<int> sorte
         octaveCorners.clear();
 
         if(H.empty()) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "ERR: findHomography returned empty matrix");
             return;
         }
 
